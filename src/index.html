@@ -1,12 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World</title>
-  </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise AI Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  <body>
-    <h1>Hello World</h1>
-  </body>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .login-container {
+            display: flex;
+            width: 950px;
+            height: 600px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1), 0 0 20px rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+            transition: box-shadow 0.4s ease, transform 0.4s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .left-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 60px;
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            border-right: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        
+        .left-panel h1 {
+            font-weight: 700;
+            font-size: 2.8rem;
+            color: #ffffff;
+        }
+
+        .left-panel .icon {
+            font-size: 3rem;
+            color: #00ffff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        .right-panel {
+            padding: 60px;
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .right-panel h2 {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            border: none;
+            border-bottom: 2px solid #334155;
+            border-radius: 0;
+            padding: 10px 10px 10px 40px;
+            background: transparent;
+            color: #ffffff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #00ffff;
+            background: transparent;
+        }
+        
+        .form-control::placeholder { color: #64748b; }
+
+        .form-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        
+        .form-control:focus ~ i {
+            color: #00ffff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+        }
+        
+        .btn-primary {
+            background: transparent;
+            border: 2px solid #00ffff;
+            margin-top: 20px;
+            padding: 12px 45px;
+            text-transform: uppercase;
+            transition: 0.5s;
+            color: #00ffff;            
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #00ffff;
+            color: #0f172a;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+        }
+        
+        .alert {
+            background-color: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.5);
+            color: #ff3b30;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="bg-animation"></canvas>
+    <div class="login-container">
+        <div class="left-panel">
+            <div class="icon"><i class="fas fa-brain"></i></div>
+            <h1>Enterprise AI Portal</h1>
+            <p class="text-white-50">Streamlining business operations with intelligent design and powerful features.</p>
+        </div>
+        <div class="right-panel">
+            <h2>Welcome Back</h2>
+            <p class="text-white-50">Please sign in to continue.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" placeholder="Username" required>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                <div id="error-message" class="alert mt-3" style="display:none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById("login-form");
+            const errorMessage = document.getElementById("error-message");
+
+            loginForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.role === 'admin' ? "/admin" : "/user";
+                    } else {
+                        errorMessage.textContent = data.message || "Invalid credentials.";
+                        errorMessage.style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                    errorMessage.style.display = "block";
+                });
+            });
+
+            // Background Animation
+            const canvas = document.getElementById('bg-animation');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const particleCount = 100;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.speedY = Math.random() * 0.5 - 0.25;
+                    this.color = 'rgba(0, 255, 255, 0.5)';
+                }
+                update() {
+                    if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                    if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                connectParticles();
+                requestAnimationFrame(animateParticles);
+            }
+
+            function connectParticles() {
+                let opacityValue = 1;
+                for (let a = 0; a < particles.length; a++) {
+                    for (let b = a; b < particles.length; b++) {
+                        let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
+                                     + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+                        if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                            opacityValue = 1 - (distance / 20000);
+                            ctx.strokeStyle = `rgba(0, 255, 255, ${opacityValue})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[a].x, particles[a].y);
+                            ctx.lineTo(particles[b].x, particles[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                particles = [];
+                initParticles();
+            });
+
+            initParticles();
+            animateParticles();
+        });
+    </script>
+</body>
 </html>
