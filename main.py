@@ -9,6 +9,7 @@ import os
 app = Flask(__name__, template_folder='src', static_folder='src')
 app.secret_key = 'your_secret_key'  # Replace with a real secret key in production
 
+a=1
 DATABASE = 'database.db'
 
 def get_db():
