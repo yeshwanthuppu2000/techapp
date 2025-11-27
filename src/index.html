@@ -35,8 +35,8 @@
 
         .login-container {
             display: flex;
-            width: 950px;
-            height: 600px;
+            width: 800px;
+            height: 500px;
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -103,14 +103,16 @@
             color: #ffffff;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
-
         .form-control:focus {
             box-shadow: none;
             border-color: #00ffff;
             background: transparent;
+            color:white;
         }
         
-        .form-control::placeholder { color: #64748b; }
+        .form-control::placeholder { color: white; opacity: 0.8; }
+        .form-control::-ms-input-placeholder { color: white; }
+        .form-control:-ms-input-placeholder { color: white; }
 
         .form-group i {
             position: absolute;
