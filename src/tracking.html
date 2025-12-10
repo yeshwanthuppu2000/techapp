@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking - IntelliTrace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(0, 255, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #e2e8f0; padding-top: 70px; }
+        .navbar-custom { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 255, 255, 0.2); }
+        .navbar-custom .nav-link, .navbar-custom .navbar-brand { color: #e2e8f0; }
+        .navbar-custom .nav-link:hover, .navbar-custom .nav-link.active { color: #00ffff; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+        .profile-dropdown .dropdown-menu { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(0, 255, 255, 0.2); }
+        .profile-dropdown .dropdown-item, .profile-dropdown .dropdown-item-text { color: #e2e8f0; }
+        .profile-dropdown .dropdown-item:hover { background-color: rgba(0, 255, 255, 0.1); }
+        
+        .tracking-container { text-align: center; padding: 3rem; animation: fadeIn 1s; }
+        .tracking-container h3 { color: #00ffff; font-weight: 300; letter-spacing: 1px; margin-bottom: 3rem; }
+
+        .progress-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; }
+        .progress-line { position: absolute; top: 35px; left: 0; width: 100%; height: 4px; background: #334155; z-index: 1; }
+        .progress-line-fill { position: absolute; top: 35px; left: 0; width: 0; height: 4px; background: #00ffff; z-index: 2; transition: width 1s ease-in-out; }
+        .progress-steps { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 3; }
+        
+        .step { display: flex; flex-direction: column; align-items: center; width: 120px; text-align: center; transition: all 0.5s; }
+        .step .icon-wrapper { width: 70px; height: 70px; border-radius: 50%; background: #1e293b; border: 3px solid #334155; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease-in-out; }
+        .step .icon-wrapper i { font-size: 1.8rem; color: #94a3b8; transition: all 0.5s; }
+        .step p { margin-top: 1rem; color: #94a3b8; font-weight: 500; transition: color 0.5s; }
+        .step .status-text { font-size: 0.8rem; color: #64748b; visibility: hidden; transition: visibility 0.5s; }
+
+        .step.active .icon-wrapper { border-color: #00ffff; animation: pulse 1.5s infinite; }
+        .step.active .icon-wrapper i { color: #00ffff; }
+        .step.active p { color: #00ffff; }
+        .step.active .status-text { visibility: visible; color: #00ffff; }
+        .step.active .icon-wrapper .fa-spinner { animation: spin 2s linear infinite; }
+
+        .step.completed .icon-wrapper { background: #00ffff; border-color: #00ffff; }
+        .step.completed .icon-wrapper i { color: #0f172a; }
+        .step.completed p { color: #e2e8f0; }
+        .step.completed .status-text { visibility: visible; color: #00cc00; }
+
+        .dashboard-btn-container { margin-top: 4rem; }
+        .dashboard-btn { display: none; background: linear-gradient(45deg, #00ffff, #00aaff); border: none; padding: 12px 30px; font-size: 1.2rem; font-weight: bold; color: #0f172a; border-radius: 50px; text-decoration: none; animation: slideIn 1s forwards; transition: all 0.3s; }
+        .dashboard-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3); }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div class="tracking-container">
+        <h3 id="tracking-header">Analyzing your document, please wait...</h3>
+        <div class="progress-wrapper">
+            <div class="progress-line"></div>
+            <div class="progress-line-fill" id="progress-line-fill"></div>
+            <div class="progress-steps">
+                <div class="step active" id="step-uploaded">
+                    <div class="icon-wrapper"><i class="fas fa-check"></i></div>
+                    <p>Uploaded</p>
+                    <span class="status-text" id="status-uploaded">Completed</span>
+                </div>
+                <div class="step" id="step-processing">
+                    <div class="icon-wrapper"><i class="fas fa-spinner"></i></div>
+                    <p>Processing</p>
+                    <span class="status-text" id="status-processing">In Progress...</span>
+                </div>
+                <div class="step" id="step-analyzed">
+                    <div class="icon-wrapper"><i class="fas fa-lightbulb"></i></div>
+                    <p>Analyzed</p>
+                     <span class="status-text" id="status-analyzed">Pending</span>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-btn-container">
+            <a href="/admin" class="btn btn-primary dashboard-btn" id="dashboard-btn">View Dashboard</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        fetch('/src/navbar.html').then(res => res.text()).then(data => { document.getElementById('navbar-container').innerHTML = data; fetch('/profile').then(res => res.json()).then(profileData => { if(profileData.username){ document.getElementById('profile-username').textContent = profileData.username; document.getElementById('profile-username-val').textContent = profileData.username; document.getElementById('profile-role-val').textContent = profileData.role; document.getElementById('profile-email-val').textContent = profileData.email; } }); });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const steps = ['uploaded', 'processing', 'analyzed'];
+            const progressFill = document.getElementById('progress-line-fill');
+
+            function updateStep(stepIndex, status) {
+                const stepId = `step-${steps[stepIndex]}`;
+                const stepEl = document.getElementById(stepId);
+                const statusEl = document.getElementById(`status-${steps[stepIndex]}`);
+                const icon = stepEl.querySelector('.icon-wrapper i');
+
+                if (status === 'active') {
+                    stepEl.classList.add('active');
+                    statusEl.textContent = 'In Progress...';
+                    icon.className = 'fas fa-spinner';
+                } else if (status === 'completed') {
+                    stepEl.classList.remove('active');
+                    stepEl.classList.add('completed');
+                    statusEl.textContent = 'Completed';
+                    icon.className = 'fas fa-check';
+                    progressFill.style.width = `${(stepIndex / (steps.length - 1)) * 100}%`;
+                }
+            }
+
+            // Simulation
+            setTimeout(() => {
+                updateStep(0, 'completed');
+                updateStep(1, 'active');
+            }, 500);
+
+            setTimeout(() => {
+                updateStep(1, 'completed');
+                updateStep(2, 'active');
+            }, 2500);
+
+            setTimeout(() => {
+                updateStep(2, 'completed');
+                document.getElementById('tracking-header').textContent = 'Analysis Complete!';
+                document.getElementById('dashboard-btn').style.display = 'inline-block';
+            }, 4500);
+        });
+    </script>
+</body>
+</html>

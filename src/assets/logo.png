@@ -1,0 +1,19 @@
+<div class="icon">
+    <img src="assets/logo.png" alt="IntelliTrace Logo" class="logo">
+</div>
+<style>
+    .logo {
+        width: 100px;
+        height: auto;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+</style>

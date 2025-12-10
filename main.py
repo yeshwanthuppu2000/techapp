@@ -25,30 +25,43 @@ def get_db():
 @app.route('/')
 def index():
     if 'user_id' in session:
-        user = get_user_by_id(session['user_id'])
-        if user and user['role'] == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return redirect(url_for('user_dashboard'))
+        return redirect(url_for('home'))
     return render_template('index.html')
+
+@app.route('/home')
+def home():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('home.html')
 
 @app.route('/admin')
 def admin_dashboard():
-    if 'role' not in session or session['role'] != 'admin':
+    if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('admin.html')
 
-@app.route('/user')
-def user_dashboard():
-    if 'user_id' not in session:
-         return redirect(url_for('index'))
-    return render_template('user.html')
-
-@app.route('/profile_page')
-def profile_page():
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('profile.html')
+    
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file part'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No selected file'}), 400
+        
+        return redirect(url_for('tracking'))
+    
+    return render_template('upload.html')
+
+@app.route('/tracking')
+def tracking():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('tracking.html')
 
 # --- API Routes ---
 @app.route('/login', methods=['POST'])
@@ -64,7 +77,7 @@ def login():
     if user and check_password_hash(user['password'], password):
         session['user_id'] = user['id']
         session['role'] = user['role']
-        return jsonify({'success': True, 'role': user['role']})
+        return jsonify({'success': True, 'redirect_url': url_for('home')})
     
     return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
 
@@ -72,6 +85,20 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json()
+    message = data.get('message')
+    model = data.get('model')
+
+    # Simulate a response from the selected LLM
+    response = f"This is a simulated response for '{message}' using {model}."
+    
+    return jsonify({'response': response})
 
 @app.route('/profile')
 def profile():
@@ -90,7 +117,7 @@ def profile():
 
 @app.route('/api/dashboard_data')
 def dashboard_data():
-    if 'role' not in session or session['role'] != 'admin':
+    if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
 
     conn = get_db()
@@ -121,7 +148,7 @@ def dashboard_data():
 
 @app.route('/users', methods=['GET', 'POST'])
 def manage_users():
-    if 'role' not in session or session['role'] != 'admin':
+    if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     conn = get_db()
@@ -151,7 +178,7 @@ def manage_users():
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
 def manage_single_user(user_id):
-    if 'role' not in session or session['role'] != 'admin':
+    if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     conn = get_db()
@@ -194,51 +221,9 @@ def manage_single_user(user_id):
         conn.close()
         return jsonify({'success': True})
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'role' not in session or session['role'] != 'admin':
-        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
-    
-    if 'file' not in request.files:
-        return jsonify({'success': False, 'error': 'No file part'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'No selected file'}), 400
-    
-    embedding_model = request.form.get('embedding_model')
-    
-    filename = file.filename
-    file_extension = os.path.splitext(filename)[1].lower()
-    
-    data = None
-
-    try:
-        if file_extension == '.csv':
-            data = pd.read_csv(file).to_dict(orient='records')
-        elif file_extension in ['.xls', '.xlsx']:
-            data = pd.read_excel(file).to_dict(orient='records')
-        elif file_extension == '.json':
-            data = json.load(file)
-        elif file_extension == '.docx':
-            doc = docx.Document(file)
-            data = [p.text for p in doc.paragraphs if p.text]
-        elif file_extension == '.txt':
-            data = file.read().decode('utf-8')
-        else:
-            return jsonify({'success': False, 'error': 'Unsupported file type'}), 400
-
-        print(f"Embedding Model: {embedding_model}")
-        print("Data:", data)
-        
-        return jsonify({'success': True, 'embedding_model': embedding_model})
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
 @app.route('/llm/settings', methods=['GET', 'POST'])
 def llm_settings():
-    if 'role' not in session or session['role'] != 'admin':
+    if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
 
     if request.method == 'POST':
@@ -272,4 +257,4 @@ def get_user_by_id(user_id):
     return user
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8081, debug=True)
