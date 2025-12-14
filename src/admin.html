@@ -30,6 +30,139 @@
         .content-section.active { display: block; }
         .modal-content { background-color: #0f172a; color: #e2e8f0; border: 1px solid rgba(0, 255, 255, 0.2); }
         .modal-header, .modal-footer { border-bottom: 1px solid rgba(0, 255, 255, 0.2); border-top: 1px solid rgba(0, 255, 255, 0.2); }
+        .nav-tabs .nav-link { background-color: transparent; border: 1px solid transparent; color: #e2e8f0; }
+        .nav-tabs .nav-link.active { color: #00ffff; border-bottom-color: #00ffff; }
+
+        /* Chat FAB and Popup Styles */
+        #chat-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #00ffff;
+            color: #0f172a;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em;
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.4);
+            cursor: pointer;
+            z-index: 1050; /* Above most content */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        #chat-fab:hover {
+            background-color: #00cccc;
+            box-shadow: 0 6px 15px rgba(0, 255, 255, 0.6);
+        }
+
+        #chat-popup {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 100px; /* Adjust based on FAB height + margin */
+            right: 30px;
+            width: 380px; /* Standard chat popup width */
+            height: 500px; /* Standard chat popup height */
+            flex-direction: column; /* Use flex for internal layout */
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.95); /* Slightly darker for popup */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            z-index: 1000; /* Below FAB */
+        }
+        #chat-popup.active {
+            display: flex; /* Show when active */
+        }
+        #chat-popup .chat-header {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-popup .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: #00ffff;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        #chat-popup .chat-header .close-btn:hover {
+            opacity: 1;
+        }
+        #chat-popup .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #chat-popup .message {
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 75%;
+            word-wrap: break-word;
+            font-size: 0.9em;
+        }
+        #chat-popup .user-message {
+            background-color: rgba(0, 255, 255, 0.2);
+            color: #e2e8f0;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        #chat-popup .bot-message {
+            background-color: rgba(226, 232, 240, 0.1);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        #chat-popup .chat-input-container {
+            display: flex;
+            padding: 10px 15px;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        #chat-popup .chat-input {
+            flex-grow: 1;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #e2e8f0;
+        }
+        #chat-popup .chat-input::placeholder {
+            color: #a0aec0;
+        }
+        #chat-popup .send-button {
+            background-color: #00ffff;
+            color: #0f172a;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+        }
+        #chat-popup .send-button:hover {
+            background-color: #00cccc;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -41,9 +174,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link active" href="#" data-section="dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-section="user-management">User Management</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-section="knowledge-base">Knowledge Base</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-section="llm-settings">LLM Settings</a></li>
+                    <li class="nav-item" id="nav-user-management"><a class="nav-link" href="#" data-section="user-management">User Management</a></li>
+                    <li class="nav-item" id="nav-knowledge-base"><a class="nav-link" href="#" data-section="knowledge-base">Knowledge Base</a></li>
+                    <li class="nav-item" id="nav-llm-settings"><a class="nav-link" href="#" data-section="llm-settings">LLM Settings</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                     <li class="nav-item">
@@ -81,17 +214,83 @@
                     <div class="col-md-3"><div class="dashboard-card kpi-card"><div class="value" id="user-count">-</div><div class="label">Users</div></div></div>
                     <div class="col-md-3"><div class="dashboard-card kpi-card"><div class="value" id="docs-processed">-</div><div class="label">Documents Processed</div></div></div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="dashboard-card">
-                            <h5>User Roles</h5>
-                            <div class="chart-container"><canvas id="user-role-chart"></canvas></div>
+                <div class="dashboard-card">
+                    <ul class="nav nav-tabs" id="dashboard-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="daily-trends-tab" data-bs-toggle="tab" data-bs-target="#daily-trends" type="button" role="tab" aria-controls="daily-trends" aria-selected="false">Daily Trends</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="timing-insights-tab" data-bs-toggle="tab" data-bs-target="#timing-insights" type="button" role="tab" aria-controls="timing-insights" aria-selected="false">Timing Insights</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab" aria-controls="categories" aria-selected="false">Categories</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="forecast-tab" data-bs-toggle="tab" data-bs-target="#forecast" type="button" role="tab" aria-controls="forecast" aria-selected="false">Forecast</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="category-list-tab" data-bs-toggle="tab" data-bs-target="#category-list" type="button" role="tab" aria-controls="category-list" aria-selected="false">Category List</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="dashboard-tabs-content">
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4"><div class="chart-container"><canvas id="overview-chart-1"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="overview-chart-2"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="overview-chart-3"></canvas></div></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="dashboard-card">
-                            <h5>Document Types</h5>
-                            <div class="chart-container"><canvas id="doc-types-chart"></canvas></div>
+                        <div class="tab-pane fade" id="daily-trends" role="tabpanel" aria-labelledby="daily-trends-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4"><div class="chart-container"><canvas id="daily-trends-chart-1"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="daily-trends-chart-2"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="daily-trends-chart-3"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="timing-insights" role="tabpanel" aria-labelledby="timing-insights-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4"><div class="chart-container"><canvas id="timing-insights-chart-1"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="timing-insights-chart-2"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="timing-insights-chart-3"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4"><div class="chart-container"><canvas id="categories-chart-1"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="categories-chart-2"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="categories-chart-3"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="forecast" role="tabpanel" aria-labelledby="forecast-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4"><div class="chart-container"><canvas id="forecast-chart-1"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="forecast-chart-2"></canvas></div></div>
+                                <div class="col-md-4"><div class="chart-container"><canvas id="forecast-chart-3"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="category-list" role="tabpanel" aria-labelledby="category-list-tab">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <select class="form-select" id="category-dropdown"></select>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <table class="table table-dark table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Incident ID</th>
+                                                <th>Summary</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="category-table-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -143,6 +342,27 @@
         </main>
     </div>
 
+    <!-- Chat Floating Action Button -->
+    <div id="chat-fab" title="Open Chat">
+        <i class="fas fa-comments"></i>
+    </div>
+
+    <!-- Chat Popup -->
+    <div id="chat-popup">
+        <div class="chat-header">
+            <i class="fas fa-comment-dots me-2"></i> IntelliTrace Chat
+            <button class="close-btn" id="chat-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages-popup">
+            <!-- Messages will be appended here -->
+            <div class="message bot-message">Hello! How can I assist you today?</div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input-popup" placeholder="Type a message...">
+            <button class="send-button" id="send-button-popup"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <!-- User Modal -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -171,6 +391,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/src/admin-dashboard.js"></script>
+    <script src="/src/chat.js" defer></script> <!-- Link to external chat.js -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- BG Animation ---
@@ -281,6 +502,28 @@
                     document.getElementById('profile-username-val').textContent = data.username;
                     document.getElementById('profile-role-val').textContent = data.role;
                     document.getElementById('profile-email-val').textContent = data.email;
+
+                    // Hide admin-only sections if user is not admin
+                    if (data.role !== 'admin') {
+                        const adminNavItems = ['nav-user-management', 'nav-knowledge-base', 'nav-llm-settings'];
+                        const adminSections = ['user-management', 'knowledge-base', 'llm-settings'];
+
+                        adminNavItems.forEach(id => {
+                            const navItem = document.getElementById(id);
+                            if (navItem) navItem.style.display = 'none';
+                        });
+
+                        adminSections.forEach(id => {
+                            const section = document.getElementById(id);
+                            if (section) section.style.display = 'none';
+                        });
+                        
+                        // If a non-admin user lands on an admin-only section, redirect to dashboard
+                        const currentSection = document.querySelector('.content-section.active');
+                        if (currentSection && adminSections.includes(currentSection.id)) {
+                             showSection('dashboard');
+                        }
+                    }
                 }
             });
             
@@ -426,6 +669,67 @@
                         alert('Error saving settings: ' + data.error);
                     }
                 });
+            });
+
+            // --- Dashboard Tabs ---
+            const dashboardTabs = new bootstrap.Tab(document.getElementById('overview-tab'));
+            dashboardTabs.show();
+
+            const kpiCategories = ['Total Users', 'Admins', 'Users', 'Documents Processed'];
+            const categoryDropdown = document.getElementById('category-dropdown');
+            kpiCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryDropdown.appendChild(option);
+            });
+
+            function generateDummyChart(canvasId, chartType = 'bar') {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Dummy Data',
+                            data: [12, 19, 3, 5, 2, 3],
+                            backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                            borderColor: 'rgba(0, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            function populateCategoryTable(category) {
+                const tableBody = document.getElementById('category-table-body');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>INC-001</td>
+                        <td>${category} Issue 1</td>
+                        <td>Description for ${category} issue 1.</td>
+                    </tr>
+                    <tr>
+                        <td>INC-002</td>
+                        <td>${category} Issue 2</td>
+                        <td>Description for ${category} issue 2.</td>
+                    </tr>
+                `;
+            }
+
+            categoryDropdown.addEventListener('change', (e) => {
+                populateCategoryTable(e.target.value);
+            });
+
+            // Initial population
+            populateCategoryTable(kpiCategories[0]);
+
+            // Generate dummy charts
+            ['overview', 'daily-trends', 'timing-insights', 'categories', 'forecast'].forEach(tab => {
+                for (let i = 1; i <= 3; i++) {
+                    generateDummyChart(`${tab}-chart-${i}`);
+                }
             });
 
             showSection('dashboard');

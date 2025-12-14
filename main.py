@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -7,6 +6,7 @@ import docx
 import json
 import os
 from dotenv import load_dotenv, set_key
+from helper import roles_required
 
 load_dotenv()
 
@@ -29,22 +29,18 @@ def index():
     return render_template('index.html')
 
 @app.route('/home')
+@roles_required('admin', 'user')
 def home():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
     return render_template('home.html')
 
 @app.route('/admin')
+@roles_required('admin', 'user')
 def admin_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
     return render_template('admin.html')
 
 @app.route('/upload', methods=['GET', 'POST'])
+@roles_required('admin', 'user')
 def upload_file():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    
     if request.method == 'POST':
         if 'file' not in request.files:
             return jsonify({'success': False, 'error': 'No file part'}), 400
@@ -58,10 +54,14 @@ def upload_file():
     return render_template('upload.html')
 
 @app.route('/tracking')
+@roles_required('admin', 'user')
 def tracking():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
     return render_template('tracking.html')
+
+@app.route('/chatpage')
+@roles_required('admin', 'user')
+def chatpage():
+    return render_template('chat.html')
 
 # --- API Routes ---
 @app.route('/login', methods=['POST'])
@@ -77,6 +77,7 @@ def login():
     if user and check_password_hash(user['password'], password):
         session['user_id'] = user['id']
         session['role'] = user['role']
+        
         return jsonify({'success': True, 'redirect_url': url_for('home')})
     
     return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
@@ -87,10 +88,8 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/chat', methods=['POST'])
+@roles_required('admin', 'user')
 def chat():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
     data = request.get_json()
     message = data.get('message')
     model = data.get('model')
@@ -101,10 +100,8 @@ def chat():
     return jsonify({'response': response})
 
 @app.route('/profile')
+@roles_required('admin', 'user')
 def profile():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
     user = get_user_by_id(session['user_id'])
     if user:
         return jsonify({
@@ -116,10 +113,8 @@ def profile():
     return jsonify({'error': 'User not found'}), 404
 
 @app.route('/api/dashboard_data')
+@roles_required('admin')
 def dashboard_data():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
     conn = get_db()
     total_users = conn.execute('SELECT COUNT(id) FROM users').fetchone()[0]
     admin_count = conn.execute('SELECT COUNT(id) FROM users WHERE role = ?', ('admin',)).fetchone()[0]
@@ -147,10 +142,8 @@ def dashboard_data():
     })
 
 @app.route('/users', methods=['GET', 'POST'])
+@roles_required('admin')
 def manage_users():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
     conn = get_db()
     if request.method == 'POST':
         data = request.get_json()
@@ -177,10 +170,8 @@ def manage_users():
     return jsonify([dict(ix) for ix in users])
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+@roles_required('admin')
 def manage_single_user(user_id):
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
     conn = get_db()
     
     if request.method == 'GET':
@@ -222,10 +213,8 @@ def manage_single_user(user_id):
         return jsonify({'success': True})
 
 @app.route('/llm/settings', methods=['GET', 'POST'])
+@roles_required('admin')
 def llm_settings():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
     if request.method == 'POST':
         data = request.get_json()
         selected_models = data.get('selected_models', [])
@@ -243,10 +232,8 @@ def llm_settings():
     })
 
 @app.route('/llm/models')
+@roles_required('admin', 'user')
 def get_llm_models():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-        
     selected_models = os.getenv('SELECTED_MODELS', '').split(',')
     return jsonify({'models': selected_models})
 
@@ -257,4 +244,4 @@ def get_user_by_id(user_id):
     return user
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081, debug=True)
+    app.run(host='0.0.0.0', port=8085, debug=True)

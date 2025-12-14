@@ -1,3 +1,17 @@
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/profile')
+        .then(response => response.json())
+        .then(data => {
+            if (data.role === 'admin') {
+                const adminDashboardLink = document.getElementById('admin-dashboard-link');
+                if (adminDashboardLink) {
+                    adminDashboardLink.style.display = 'block';
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching user profile:', error));
+});
+
 let userRoleChart, docTypesChart;
 
 function initCharts() {
