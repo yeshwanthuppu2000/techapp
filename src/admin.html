@@ -174,9 +174,14 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link active" href="#" data-section="dashboard">Dashboard</a></li>
-                    <li class="nav-item" id="nav-user-management"><a class="nav-link" href="#" data-section="user-management">User Management</a></li>
-                    <li class="nav-item" id="nav-knowledge-base"><a class="nav-link" href="#" data-section="knowledge-base">Knowledge Base</a></li>
-                    <li class="nav-item" id="nav-llm-settings"><a class="nav-link" href="#" data-section="llm-settings">LLM Settings</a></li>
+                    <li class="nav-item" id="nav-user-management"><a class="nav-link" href="#" data-section="user-management">Users</a></li>
+                    <!-- Removed Knowledge Base and LLM Settings -->
+                    <li class="nav-item" id="nav-token-counter"><a class="nav-link" href="#" data-section="token-counter">Token Counter</a></li>
+                    <li class="nav-item" id="nav-token-cost"><a class="nav-link" href="#" data-section="token-cost">Cost Calculator</a></li>
+                    <li class="nav-item" id="nav-prompt-enrichment"><a class="nav-link" href="#" data-section="prompt-enrichment">Prompt Analysis</a></li>
+                    <li class="nav-item" id="nav-llm-as-judge"><a class="nav-link" href="#" data-section="llm-as-judge">LLM Judge</a></li>
+                    <li class="nav-item" id="nav-token-optimization"><a class="nav-link" href="#" data-section="token-optimization">Optimizer</a></li>
+                    <li class="nav-item" id="nav-feedback"><a class="nav-link" href="#" data-section="feedback">Feedback</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                     <li class="nav-item">
@@ -307,36 +312,53 @@
                     </table>
                 </div>
             </section>
-            <section id="knowledge-base" class="content-section">
+            <!-- Removed Knowledge Base and LLM Settings sections -->
+
+            <section id="token-counter" class="content-section">
                 <div class="dashboard-card">
-                    <h2 class="mb-4">Update Knowledge Base</h2>
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="file-upload" class="form-label">Upload File (.xlsx, .csv, .json, .docx, .txt)</label>
-                            <input type="file" class="form-control" id="file-upload" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="embedding-model" class="form-label">Choose Embedding Model</label>
-                            <select class="form-select" id="embedding-model" required>
-                                <option value="text-embedding-ada-002">text-embedding-ada-002</option>
-                                <option value="text-embedding-3-small">text-embedding-3-small</option>
-                                <option value="text-embedding-3-large">text-embedding-3-large</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </form>
+                    <h2>Token Counter</h2>
+                    <p>Monitor and analyze token usage for LLM calls.</p>
+                    <!-- Placeholder for Token Counter content -->
                 </div>
             </section>
-            <section id="llm-settings" class="content-section">
+
+            <section id="token-cost" class="content-section">
                 <div class="dashboard-card">
-                    <h2 class="mb-4">LLM Settings</h2>
-                    <form id="llmForm">
-                        <div class="mb-3">
-                            <label class="form-label">Select the models users can access:</label>
-                            <div id="llm-options"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                    </form>
+                    <h2>Token Cost</h2>
+                    <p>Calculate cost per token and get suggestions for reducing consumption cost.</p>
+                    <!-- Placeholder for Token Cost content -->
+                </div>
+            </section>
+
+            <section id="prompt-enrichment" class="content-section">
+                <div class="dashboard-card">
+                    <h2>Prompt Enrichment</h2>
+                    <p>Review and utilize prompt enrichment suggestions from users to change models effectively.</p>
+                    <!-- Placeholder for Prompt Enrichment content -->
+                </div>
+            </section>
+
+            <section id="llm-as-judge" class="content-section">
+                <div class="dashboard-card">
+                    <h2>LLM as Judge</h2>
+                    <p>Create multiple LLM threads (e.g., writer and editor) and decide which output to use as a judge.</p>
+                    <!-- Placeholder for LLM as Judge content -->
+                </div>
+            </section>
+
+            <section id="token-optimization" class="content-section">
+                <div class="dashboard-card">
+                    <h2>Token Optimization</h2>
+                    <p>Tools and strategies for optimizing token usage.</p>
+                    <!-- Placeholder for Token Optimization content -->
+                </div>
+            </section>
+
+            <section id="feedback" class="content-section">
+                <div class="dashboard-card">
+                    <h2>Feedback</h2>
+                    <p>Analyze and manage feedback provided by users.</p>
+                    <!-- Placeholder for Feedback content -->
                 </div>
             </section>
         </main>
@@ -485,7 +507,7 @@
                 
                 if (sectionId === 'dashboard') loadDashboardData();
                 if (sectionId === 'user-management') fetchUsers();
-                if (sectionId === 'llm-settings') fetchLlmSettings();
+                // Removed fetchLlmSettings() as LLM Settings section is removed
             }
 
             navLinks.forEach(link => {
@@ -505,8 +527,24 @@
 
                     // Hide admin-only sections if user is not admin
                     if (data.role !== 'admin') {
-                        const adminNavItems = ['nav-user-management', 'nav-knowledge-base', 'nav-llm-settings'];
-                        const adminSections = ['user-management', 'knowledge-base', 'llm-settings'];
+                        const adminNavItems = [
+                            'nav-user-management', 
+                            'nav-token-counter', 
+                            'nav-token-cost', 
+                            'nav-prompt-enrichment', 
+                            'nav-llm-as-judge', 
+                            'nav-token-optimization', 
+                            'nav-feedback'
+                        ];
+                        const adminSections = [
+                            'user-management', 
+                            'token-counter', 
+                            'token-cost', 
+                            'prompt-enrichment', 
+                            'llm-as-judge', 
+                            'token-optimization', 
+                            'feedback'
+                        ];
 
                         adminNavItems.forEach(id => {
                             const navItem = document.getElementById(id);
@@ -616,60 +654,7 @@
                 });
             });
 
-            document.getElementById('uploadForm').addEventListener('submit', e => {
-                e.preventDefault();
-                const fileInput = document.getElementById('file-upload');
-                const embeddingModel = document.getElementById('embedding-model').value;
-                const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                formData.append('embedding_model', embeddingModel);
-
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(`File uploaded successfully. Using model: ${data.embedding_model}`);
-                        fileInput.value = '';
-                    } else {
-                        alert('Error uploading file: ' + data.error);
-                    }
-                });
-            });
-
-            function fetchLlmSettings() {
-                fetch('/llm/settings').then(res => res.json()).then(settings => {
-                    const optionsContainer = document.getElementById('llm-options');
-                    optionsContainer.innerHTML = settings.all_models.map(model => `
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="${model}" id="llm-${model}" 
-                                ${settings.selected_models.includes(model) ? 'checked' : ''}>
-                            <label class="form-check-label" for="llm-${model}">${model}</label>
-                        </div>
-                    `).join('');
-                });
-            }
-
-            document.getElementById('llmForm').addEventListener('submit', e => {
-                e.preventDefault();
-                const selectedModels = Array.from(document.querySelectorAll('#llm-options input:checked')).map(input => input.value);
-                
-                fetch('/llm/settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ selected_models: selectedModels })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('LLM settings saved successfully!');
-                    } else {
-                        alert('Error saving settings: ' + data.error);
-                    }
-                });
-            });
+            // Removed uploadForm and fetchLlmSettings functions as the sections are removed.
 
             // --- Dashboard Tabs ---
             const dashboardTabs = new bootstrap.Tab(document.getElementById('overview-tab'));
